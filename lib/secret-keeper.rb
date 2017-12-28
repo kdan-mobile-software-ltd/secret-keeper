@@ -1,4 +1,5 @@
 require 'openssl'
+require 'yaml'
 
 class SecretKeeper
   def self.hi
@@ -10,7 +11,7 @@ class SecretKeeper
     sk = SecretKeeper.new
     sk.tasks.each do |decrypted_file, encrypted_file|
       result = sk.encrypt_file(decrypted_file, encrypted_file)
-      puts "#{decrypted_file} --> #{encrypted_file}, #{result}"
+      puts "* #{decrypted_file} --> #{encrypted_file}, #{result}"
     end
     puts 'Encrypt end!'
     true
@@ -21,19 +22,19 @@ class SecretKeeper
     sk = SecretKeeper.new
     sk.tasks.each do |decrypted_file, encrypted_file|
       result = sk.decrypt_file(encrypted_file, decrypted_file)
-      puts "#{encrypted_file} --> #{decrypted_file}, #{result}"
+      puts "* #{encrypted_file} --> #{decrypted_file}, #{result}"
     end
     puts 'Decrypt end!'
     true
   end
 
   def initialize
-    @password = 'password'
-    @tasks = [
-      ['example/database.yml', 'config/database.yml.enc'],
-      ['example/secrets.yml', 'config/secrets.yml.enc'],
-    ]
-    @using_cipher = OpenSSL::Cipher::AES.new(256, 'CBC')
+    env = ENV['RAILS_ENV'] || 'development'
+    string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
+    config = YAML.load(string)[env]
+    @password = ENV['OPENSSL_PASS']
+    @tasks = config['tasks']
+    @using_cipher = OpenSSL::Cipher.new(config['cipher'])
   end
 
   def tasks
@@ -45,7 +46,7 @@ class SecretKeeper
     File.open(encrypted_file, 'w:ASCII-8BIT') { |f| f.write(encrypted) }
     :ok
   rescue => e
-    return e.message
+    "fail: #{e}"
   end
 
   def decrypt_file(encrypted_file, decrypted_file)
@@ -53,7 +54,7 @@ class SecretKeeper
     File.open(decrypted_file, 'w') { |f| f.write(decrypted) }
     :ok
   rescue => e
-    return e.message
+    "fail: #{e}"
   end
 
   private
