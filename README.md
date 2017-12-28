@@ -30,18 +30,18 @@ SecretKeeper.decrypt_files
 
 ## Config Example
 
-```development: &development
-  cipher: AES-256-CBC
-  tasks:
-    -
-      - example/database.yml
-      - example/database.yml.enc
-    -
-      - example/secrets.yml
-      - example/secrets.yml.enc
+    development: &development
+      cipher: AES-256-CBC
+      tasks:
+        -
+          - example/database.yml
+          - example/database.yml.enc
+        -
+          - example/secrets.yml
+          - example/secrets.yml.enc
 
-test:
-  <<: *development
+    test:
+      <<: *development
 
-production:
-  <<: *development```
+    production:
+      <<: *development
