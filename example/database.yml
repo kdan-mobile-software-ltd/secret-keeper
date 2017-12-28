@@ -1,0 +1,16 @@
+development: &development
+  host: localhost
+  port: 5432
+  adapter: postgresql
+  encoding: utf8
+  username: postgres
+  password: postgres
+  database: postgres
+  pool: 5
+  timeout: 5000
+
+test:
+  <<: *development
+
+production:
+  <<: *development
