@@ -32,7 +32,7 @@ class SecretKeeper
     env = ENV['RAILS_ENV'] || 'development'
     string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
     config = YAML.load(string)[env]
-    @password = ENV['OPENSSL_PASS']
+    @password = ENV['OPENSSL_PASS'] || 'DEFAULT-PASSWORD'
     @tasks = config['tasks']
     @using_cipher = OpenSSL::Cipher.new(config['cipher'])
   end
