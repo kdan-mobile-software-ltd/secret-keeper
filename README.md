@@ -4,24 +4,34 @@ Keep all your secret files within openssl
 
 ## Install
 
-install from console
+from console
 
     gem install secret-keeper
 
-or write follwing line in your Gemfile
+with bundler, write follwing line in your Gemfile
 
     gem 'secret-keeper'
 
 
 ## Usage
+using environment variable OPENSSL_PASS to be your key of cipher
 
-    $> OPENSSL_PASS=DEFAULT-PASSWORD irb
+    $> OPENSSL_PASS=[YOUR-CIPHER-KEY-HERE] irb
+
+require on demand
+
     irb> require 'secret-keeper'
+
+encrypt files based on your tasks defined in config/secret-keeper.yml
+
     irb> SecretKeeper.encrypt_files
     # Encrypting...
     #   * example/database.yml --> example/database.yml.enc, ok
     #   * example/secrets.yml --> example/secrets.yml.enc, ok
     # Over!
+
+decrypt files based on your tasks defined in config/secret-keeper.yml
+
     irb> SecretKeeper.decrypt_files
     # Decrypting...
     #   * example/database.yml.enc --> example/database.yml, ok
