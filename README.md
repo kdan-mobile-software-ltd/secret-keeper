@@ -10,7 +10,7 @@ from console
 
 with bundler, write follwing line in your Gemfile
 
-    gem 'secret-keeper'
+    gem 'secret-keeper', require: false
 
 
 ## Usage
