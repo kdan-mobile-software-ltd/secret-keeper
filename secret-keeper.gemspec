@@ -1,10 +1,7 @@
-
-
 Gem::Specification.new do |s|
   s.name        = 'secret-keeper'
-  s.version     = '0.1.1'
+  s.version     = '0.1.2'
   s.platform    = Gem::Platform::RUBY
-  s.date        = '2017-12-28'
   s.summary     = 'Keep all your secret files within openssl'
   s.description = 'A Secret keeper'
   s.authors     = ['Ray Lee']
