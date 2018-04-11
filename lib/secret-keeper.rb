@@ -3,9 +3,9 @@ require 'yaml'
 
 class SecretKeeper
   def self.encrypt_files
+    sk = SecretKeeper.new
     puts 'Encrypting...'
     ok_queue = []
-    sk = SecretKeeper.new
     sk.tasks.each do |task|
       from = task['encrypt_from']
       to = task['encrypt_to']
@@ -14,14 +14,15 @@ class SecretKeeper
       ok_queue << result if result == :ok
       puts "  * #{from} --> #{to}, #{result}"
     end
-    puts 'Done!'
-    ok_queue.count == sk.tasks.count
+    success = ok_queue.count == sk.tasks.count
+    puts success ? 'Done!' : 'Failed!'
+    success
   end
 
   def self.decrypt_files
+    sk = SecretKeeper.new
     puts 'Decrypting...'
     ok_queue = []
-    sk = SecretKeeper.new
     sk.tasks.each do |task|
       from = task['decrypt_from'] || task['encrypt_to']
       to = task['decrypt_to'] || task['encrypt_from']
@@ -30,8 +31,9 @@ class SecretKeeper
       ok_queue << result if result == :ok
       puts "  * #{from} --> #{to}, #{result}"
     end
-    puts 'Done!'
-    ok_queue.count == sk.tasks.count
+    success = ok_queue.count == sk.tasks.count
+    puts success ? 'Done!' : 'Failed!'
+    success
   end
 
   def initialize
@@ -40,7 +42,7 @@ class SecretKeeper
     string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
     config = YAML.load(string)[env]
     fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil?
-    
+
     @tasks = config['tasks']
     @using_cipher = OpenSSL::Cipher.new(config['cipher'])
   end
@@ -69,13 +71,13 @@ class SecretKeeper
 
   def encrypt(data)
     cipher = @using_cipher.encrypt
-    cipher.key = Digest::SHA1.hexdigest(ENV['OPENSSL_PASS'])
+    cipher.key = Digest::SHA2.hexdigest(ENV['OPENSSL_PASS'])[0..(cipher.key_len-1)]
     cipher.update(data) + cipher.final
   end
 
   def decrypt(data)
     cipher = @using_cipher.decrypt
-    cipher.key = Digest::SHA1.hexdigest(ENV['OPENSSL_PASS'])
+    cipher.key = Digest::SHA2.hexdigest(ENV['OPENSSL_PASS'])[0..(cipher.key_len-1)]
     cipher.update(data) + cipher.final
   end
 end
