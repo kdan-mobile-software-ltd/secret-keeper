@@ -1,6 +1,6 @@
 describe SecretKeeper do
   before(:each) do
-    ENV['OPENSSL_PASS'] = 'PASSWORD'
+    ENV['SECRET_KEEPER'] = 'PASSWORD_HERE'
   end
 
   describe '.encrypt_files' do
@@ -16,14 +16,14 @@ describe SecretKeeper do
       expect(result).to eq(true)
     end
 
-    it 'should be false, if OPENSSL_PASS incorrect' do
-      ENV['OPENSSL_PASS'] = 'incorrect'
+    it 'should be false, if SECRET_KEEPER incorrect' do
+      ENV['SECRET_KEEPER'] = 'incorrect'
       result = SecretKeeper.decrypt_files
       expect(result).to eq(false)
     end
 
-    it 'should raise error, if OPENSSL_PASS nil' do
-      ENV['OPENSSL_PASS'] = nil
+    it 'should raise error, if SECRET_KEEPER nil' do
+      ENV['SECRET_KEEPER'] = nil
       expect{ SecretKeeper.decrypt_files }.to raise_error(RuntimeError)
     end
 

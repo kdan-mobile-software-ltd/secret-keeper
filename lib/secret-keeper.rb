@@ -37,11 +37,13 @@ class SecretKeeper
   end
 
   def initialize
-    fail 'environment variable OPENSSL_PASS not exist' if ENV['OPENSSL_PASS'].nil?
     env = ENV['RAILS_ENV'] || 'development'
     string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
+    fail 'config/secret-keeper.yml not existed nor not readable' if string.nil?
     config = YAML.load(string)[env]
     fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil?
+    @ev_name = config['ev_name'] || 'SECRET_KEEPER'
+    fail "environment variable #{@ev_name} not exist" if ENV[@ev_name].nil?
 
     @tasks = config['tasks']
     @using_cipher = OpenSSL::Cipher.new(config['cipher'])
@@ -71,13 +73,13 @@ class SecretKeeper
 
   def encrypt(data)
     cipher = @using_cipher.encrypt
-    cipher.key = Digest::SHA2.hexdigest(ENV['OPENSSL_PASS'])[0..(cipher.key_len-1)]
+    cipher.key = Digest::SHA2.hexdigest(ENV[@ev_name])[0..(cipher.key_len-1)]
     cipher.update(data) + cipher.final
   end
 
   def decrypt(data)
     cipher = @using_cipher.decrypt
-    cipher.key = Digest::SHA2.hexdigest(ENV['OPENSSL_PASS'])[0..(cipher.key_len-1)]
+    cipher.key = Digest::SHA2.hexdigest(ENV[@ev_name])[0..(cipher.key_len-1)]
     cipher.update(data) + cipher.final
   end
 end
