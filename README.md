@@ -55,6 +55,15 @@ decrypt files based on your tasks defined in config/secret-keeper.yml
     #   * example/secrets.yml.enc --> example/secrets.yml, ok
     # Done!
 
+decrypt files and remove production configs
+
+    irb> SecretKeeper.decrypt_files
+    # Decrypting...
+    # remove production configs after decrypted
+    #   * example/database.yml.enc --> example/database.yml, ok
+    #   * example/secrets.yml.enc --> example/secrets.yml, ok
+    # Done!
+
 ## Available Ciphers
 
     irb> require 'openssl'
