@@ -77,6 +77,7 @@ class SecretKeeper
   end
 
   def remove_production_config(file_path)
+    return :ok unless file_path =~ /\.yml/
     hash = YAML.load_file(file_path)
     hash.delete('production')
     File.write(file_path, YAML.dump(hash))

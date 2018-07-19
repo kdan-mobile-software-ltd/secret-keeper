@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'secret-keeper'
-  s.version     = '0.2.3'
+  s.version     = '0.2.4'
   s.platform    = Gem::Platform::RUBY
   s.summary     = 'Keep all your secret files within openssl'
   s.description = 'A Secret keeper'
