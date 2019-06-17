@@ -1,6 +1,6 @@
 require 'bundler/setup'
-require 'secret-keeper'
 require 'yaml'
+require 'secret-keeper'
 
 Bundler.setup
 
