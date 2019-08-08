@@ -21,8 +21,9 @@ class SecretKeeper
 
   def self.decrypt_files(remove_production=false)
     sk = SecretKeeper.new
-    puts 'Decrypting...'
-    puts 'remove production configs after decrypted' if remove_production
+    print 'Decrypting...'
+    puts remove_production ? '(production config removed)' : nil
+
     ok_queue = []
     sk.tasks.each do |task|
       from = task['decrypt_from'] || task['encrypt_to']
