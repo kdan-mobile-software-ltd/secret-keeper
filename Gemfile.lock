@@ -1,26 +1,30 @@
 PATH
   remote: .
   specs:
-    secret-keeper (0.2.5)
+    secret-keeper (0.2.6)
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.3)
-    irb (1.0.0)
-    rspec (3.8.0)
-      rspec-core (~> 3.8.0)
-      rspec-expectations (~> 3.8.0)
-      rspec-mocks (~> 3.8.0)
-    rspec-core (3.8.1)
-      rspec-support (~> 3.8.0)
-    rspec-expectations (3.8.4)
+    io-console (0.5.6)
+    irb (1.2.3)
+      reline (>= 0.0.1)
+    reline (0.1.3)
+      io-console (~> 0.5)
+    rspec (3.9.0)
+      rspec-core (~> 3.9.0)
+      rspec-expectations (~> 3.9.0)
+      rspec-mocks (~> 3.9.0)
+    rspec-core (3.9.1)
+      rspec-support (~> 3.9.1)
+    rspec-expectations (3.9.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.8.0)
-    rspec-mocks (3.8.1)
+      rspec-support (~> 3.9.0)
+    rspec-mocks (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.8.0)
-    rspec-support (3.8.2)
+      rspec-support (~> 3.9.0)
+    rspec-support (3.9.2)
 
 PLATFORMS
   ruby
@@ -31,7 +35,7 @@ DEPENDENCIES
   secret-keeper!
 
 RUBY VERSION
-   ruby 2.6.1p33
+   ruby 2.7.0p0
 
 BUNDLED WITH
-   1.17.3
+   2.1.4

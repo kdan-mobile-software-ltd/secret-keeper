@@ -4,7 +4,7 @@ require 'yaml'
 class SecretKeeper
   def self.encrypt_files
     sk = SecretKeeper.new
-    puts 'Encrypting...'
+    puts 'Encrypting...' unless sk.slience
     ok_queue = []
     sk.tasks.each do |task|
       from = task['encrypt_from']
@@ -12,17 +12,17 @@ class SecretKeeper
 
       result = sk.encrypt_file(from, to)
       ok_queue << result if result == :ok
-      puts "  * #{from} --> #{to}, #{result}"
+      puts "  * #{from} --> #{to}, #{result}" unless sk.slience
     end
     success = ok_queue.count == sk.tasks.count
-    puts success ? 'Done!' : 'Failed!'
+    puts success ? 'Done!' : 'Failed!' unless sk.slience
     success
   end
 
   def self.decrypt_files(remove_production=false)
     sk = SecretKeeper.new
-    print 'Decrypting...'
-    puts remove_production ? '(production config removed)' : nil
+    print 'Decrypting...' unless sk.slience
+    puts remove_production ? '(production config removed)' : nil unless sk.slience
 
     ok_queue = []
     sk.tasks.each do |task|
@@ -36,10 +36,10 @@ class SecretKeeper
       end
 
       ok_queue << result if result == :ok
-      puts "  * #{from} --> #{to}, #{result}"
+      puts "  * #{from} --> #{to}, #{result}" unless sk.slience
     end
     success = ok_queue.count == sk.tasks.count
-    puts success ? 'Done!' : 'Failed!'
+    puts success ? 'Done!' : 'Failed!' unless sk.slience
     success
   end
 
@@ -55,10 +55,15 @@ class SecretKeeper
     @cipher_digest = ENV[ev_name]
     @tasks = config['tasks']
     @using_cipher = OpenSSL::Cipher.new(config['cipher'])
+    @slience = config['slience'] || false
   end
 
   def tasks
     @tasks
+  end
+
+  def slience
+    @slience
   end
 
   def encrypt_file(from_file, to_file)
