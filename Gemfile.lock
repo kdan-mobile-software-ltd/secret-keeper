@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    secret-keeper (0.2.6)
+    secret-keeper (0.2.7)
 
 GEM
   remote: https://rubygems.org/

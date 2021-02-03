@@ -1,0 +1,27 @@
+stages:
+  - rspec
+  - publish
+
+rspec:
+  stage: rspec
+  image: ruby:2.7.0
+  script:
+    - bundle install
+    - rspec spec
+  only:
+    - master
+
+to_gem:
+  stage: publish
+  image: ruby:2.7.0
+  script:
+    - mkdir -p ~/.gem
+    - touch ~/.gem/credentials
+    - chmod 0600 ~/.gem/credentials
+    - 'printf -- "---\n:rubygems_api_key: $GEM_HOST_API_KEY\n" > ~/.gem/credentials'
+    - RELEASE_VERSION=$(cat VERSION.md)
+    - GEM_NAME=secret-keeper-$RELEASE_VERSION.gem
+    - gem build secret-keeper.gemspec
+    - gem push $GEM_NAME
+  only:
+    - master

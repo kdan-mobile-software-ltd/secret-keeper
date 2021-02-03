@@ -76,7 +76,7 @@ class SecretKeeper
 
   def decrypt_file(from_file, to_file)
     decrypted = File.open(from_file, 'rb') { |f| decrypt(f.read) }
-    File.open(to_file, 'w') { |f| f.write(decrypted) }
+    File.open(to_file, 'w') { |f| f.write(decrypted.force_encoding('UTF-8')) }
     :ok
   rescue => e
     e
