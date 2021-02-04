@@ -4,7 +4,7 @@ stages:
 
 rspec:
   stage: rspec
-  image: ruby:2.7.0
+  image: ruby:2.7.2
   script:
     - bundle install
     - rspec spec
@@ -13,7 +13,7 @@ rspec:
 
 to_gem:
   stage: publish
-  image: ruby:2.7.0
+  image: ruby:2.7.2
   script:
     - mkdir -p ~/.gem
     - touch ~/.gem/credentials

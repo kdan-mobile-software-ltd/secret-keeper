@@ -52,9 +52,10 @@ class SecretKeeper
     ev_name = config['ev_name'] || 'SECRET_KEEPER'
     fail "environment variable #{ev_name} not exist" if ENV[ev_name].nil?
 
-    @cipher_digest = ENV[ev_name]
     @tasks = config['tasks']
-    @using_cipher = OpenSSL::Cipher.new(config['cipher'])
+    @using_cipher = OpenSSL::Cipher.new(config['cipher'] || 'AES-256-CBC')
+    @cipher_key = Digest::SHA2.hexdigest(ENV[ev_name])[0...@using_cipher.key_len]
+
     @slience = config['slience'] || false
   end
 
@@ -96,15 +97,13 @@ class SecretKeeper
 
   def encrypt(data)
     cipher = @using_cipher.encrypt
-    key_size_range = 0..(cipher.key_len-1)
-    cipher.key = Digest::SHA2.hexdigest(@cipher_digest)[key_size_range]
+    cipher.key = @cipher_key
     cipher.update(data) + cipher.final
   end
 
   def decrypt(data)
     cipher = @using_cipher.decrypt
-    key_size_range = 0..(cipher.key_len-1)
-    cipher.key = Digest::SHA2.hexdigest(@cipher_digest)[key_size_range]
+    cipher.key = @cipher_key
     cipher.update(data) + cipher.final
   end
 end
