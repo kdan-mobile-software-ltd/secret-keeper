@@ -1,6 +1,4 @@
 *.gem
 config/secret-keeper-tmp.yml
-.ruby-version
-.ruby-gemset
 .editorconfig
 .bundle
