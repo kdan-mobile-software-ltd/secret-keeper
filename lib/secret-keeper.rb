@@ -43,6 +43,23 @@ class SecretKeeper
     success
   end
 
+  def self.cleanup_files
+    sk = SecretKeeper.new
+    print 'Cleaning...' unless sk.slience
+
+    ok_queue = []
+    sk.tasks.each do |task|
+      to = task['decrypt_to'] || task['encrypt_from']
+
+      result = sk.cleanup_file(to)
+      ok_queue << result if result == :ok
+      puts "  * Delete file #{to}, #{result}" unless sk.slience
+    end
+    success = ok_queue.count == sk.tasks.count
+    puts success ? 'Done!' : 'Failed!' unless sk.slience
+    success
+  end
+
   def initialize
     env = ENV['RAILS_ENV'] || 'development'
     string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
@@ -78,6 +95,13 @@ class SecretKeeper
   def decrypt_file(from_file, to_file)
     decrypted = File.open(from_file, 'rb') { |f| decrypt(f.read) }
     File.open(to_file, 'w') { |f| f.write(decrypted.force_encoding('UTF-8')) }
+    :ok
+  rescue => e
+    e
+  end
+
+  def cleanup_file(target_file)
+    File.delete(target_file)
     :ok
   rescue => e
     e

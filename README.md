@@ -64,6 +64,14 @@ decrypt files and remove production configs
     #   * example/secrets.yml.enc --> example/secrets.yml, ok
     # Done!
 
+cleanup files which has been encrypted
+
+    irb> SecretKeeper.cleanup_files
+    # Cleaning...
+    #   * Delete file example/database.yml, ok
+    #   * Delete file example/secrets.yml, ok
+    # Done!
+
 ## Available Ciphers
 
     irb> require 'openssl'

@@ -58,4 +58,50 @@ describe SecretKeeper do
       FileUtils.mv('config/secret-keeper-tmp.yml', 'config/secret-keeper.yml')
     end
   end
+
+  describe '.cleanup_files' do
+    it 'should return true' do
+      tasks = YAML.load_file('config/secret-keeper.yml')['development']['tasks']
+      tmp_files = []
+      tasks.each do |task|
+        origin_name = task['decrypt_to'] || task['encrypt_from']
+        backup_name = "#{origin_name}_backup"
+        tmp_files << { 'origin_name' => origin_name, 'backup_name' => backup_name }
+        FileUtils.cp(origin_name, backup_name)
+      end
+
+      result = SecretKeeper.cleanup_files
+      expect(result).to eq(true)
+      tasks.each do |task|
+        target_file = task['decrypt_to'] || task['encrypt_from']
+        expect(File.exists?(target_file)).to eq(false)
+      end
+
+      tmp_files.each { |f| FileUtils.mv(f['backup_name'], f['origin_name']) }
+    end
+
+    it 'should return false if one or more origin files do not exist' do
+      tasks = YAML.load_file('config/secret-keeper.yml')['development']['tasks']
+      tmp_files = []
+      tasks.each_with_index do |task, index|
+        origin_name = task['decrypt_to'] || task['encrypt_from']
+        backup_name = "#{origin_name}_backup"
+        tmp_files << { 'origin_name' => origin_name, 'backup_name' => backup_name }
+        if index.odd?
+          FileUtils.mv(origin_name, backup_name)
+        else
+          FileUtils.cp(origin_name, backup_name)
+        end
+      end
+
+      result = SecretKeeper.cleanup_files
+      expect(result).to eq(false)
+      tasks.each do |task|
+        target_file = task['decrypt_to'] || task['encrypt_from']
+        expect(File.exists?(target_file)).to eq(false)
+      end
+
+      tmp_files.each { |f| FileUtils.mv(f['backup_name'], f['origin_name']) }
+    end
+  end
 end
