@@ -47,6 +47,15 @@ encrypt files based on your tasks defined in config/secret-keeper.yml
     #   * example/secrets.yml --> example/secrets.yml.enc, ok
     # Done!
 
+encrypt files, then remove source files
+
+    irb> SecretKeeper.encrypt_files(true)
+    # Encrypting... (source files removed)
+    #   * example/database.yml --> example/database.yml.enc, ok
+    #   * example/secrets.yml --> example/secrets.yml.enc, ok
+    # Done!
+
+
 decrypt files based on your tasks defined in config/secret-keeper.yml
 
     irb> SecretKeeper.decrypt_files
@@ -64,13 +73,16 @@ decrypt files and remove production configs
     #   * example/secrets.yml.enc --> example/secrets.yml, ok
     # Done!
 
-cleanup files which has been encrypted
+decrypt files, then remove source files
 
-    irb> SecretKeeper.cleanup_files
-    # Cleaning...
-    #   * Delete file example/database.yml, ok
-    #   * Delete file example/secrets.yml, ok
+    irb> SecretKeeper.encrypt_files(false, true)
+    # Decrypting... (source files removed)
+    #   * example/database.yml.enc --> example/database.yml, ok
+    #   * example/secrets.yml.enc --> example/secrets.yml, ok
     # Done!
+
+### If remove production configs is set to true, source files will not be removed, even if remove source files flag is true.
+
 
 ## Available Ciphers
 

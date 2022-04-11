@@ -2,37 +2,19 @@ require 'openssl'
 require 'yaml'
 
 class SecretKeeper
-  def self.encrypt_files
+  def self.encrypt_files(remove_source = false)
     sk = SecretKeeper.new
-    puts 'Encrypting...' unless sk.slience
+    print 'Encrypting...' unless sk.slience
+    puts remove_source ? '(source files removed)' : nil unless sk.slience
+
     ok_queue = []
     sk.tasks.each do |task|
-      from = task['encrypt_from']
+      from = File.exists?(task['encrypt_from']) ? task['encrypt_from'] : task['decrypt_to']
       to = task['encrypt_to']
 
       result = sk.encrypt_file(from, to)
-      ok_queue << result if result == :ok
-      puts "  * #{from} --> #{to}, #{result}" unless sk.slience
-    end
-    success = ok_queue.count == sk.tasks.count
-    puts success ? 'Done!' : 'Failed!' unless sk.slience
-    success
-  end
-
-  def self.decrypt_files(remove_production=false)
-    sk = SecretKeeper.new
-    print 'Decrypting...' unless sk.slience
-    puts remove_production ? '(production config removed)' : nil unless sk.slience
-
-    ok_queue = []
-    sk.tasks.each do |task|
-      from = task['decrypt_from'] || task['encrypt_to']
-      to = task['decrypt_to'] || task['encrypt_from']
-
-      result = sk.decrypt_file(from, to)
-
-      if result == :ok && remove_production
-        result = sk.remove_production_config(to)
+      if result == :ok && remove_source
+        result = sk.remove_file(from)
       end
 
       ok_queue << result if result == :ok
@@ -43,17 +25,36 @@ class SecretKeeper
     success
   end
 
-  def self.cleanup_files
+  def self.decrypt_files(remove_production=false, remove_source = false)
     sk = SecretKeeper.new
-    print 'Cleaning...' unless sk.slience
+
+    unless sk.slience
+      msg = 'Decrypting...'
+      if remove_production
+        msg += '(production config removed)'
+      elsif remove_source
+        msg += '(source files removed)'
+      end
+      puts msg
+    end
 
     ok_queue = []
     sk.tasks.each do |task|
+      from = task['decrypt_from'] || task['encrypt_to']
       to = task['decrypt_to'] || task['encrypt_from']
 
-      result = sk.cleanup_file(to)
+      result = sk.decrypt_file(from, to)
+
+      if result == :ok
+        if remove_production
+          result = sk.remove_production_config(to)
+        elsif remove_source
+          result = sk.remove_file(from)
+        end
+      end
+
       ok_queue << result if result == :ok
-      puts "  * Delete file #{to}, #{result}" unless sk.slience
+      puts "  * #{from} --> #{to}, #{result}" unless sk.slience
     end
     success = ok_queue.count == sk.tasks.count
     puts success ? 'Done!' : 'Failed!' unless sk.slience
@@ -100,18 +101,18 @@ class SecretKeeper
     e
   end
 
-  def cleanup_file(target_file)
-    File.delete(target_file)
-    :ok
-  rescue => e
-    e
-  end
-
   def remove_production_config(file_path)
     return :ok unless file_path =~ /\.yml/
     hash = YAML.load_file(file_path)
     hash.delete('production')
     File.write(file_path, YAML.dump(hash))
+    :ok
+  rescue => e
+    e
+  end
+
+  def remove_file(file_path)
+    File.delete(file_path)
     :ok
   rescue => e
     e
