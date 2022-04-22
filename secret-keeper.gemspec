@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'secret-keeper'
-  s.version     = '1.1.0'
+  s.version     = '2.0.0'
   s.platform    = Gem::Platform::RUBY
   s.summary     = 'Keep all your secret files within openssl'
   s.description = 'A Secret keeper'
@@ -14,6 +14,6 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = [ 'README.md' ]
   s.rdoc_options     = ['--charset=UTF-8']
 
-  s.required_ruby_version = '>= 2.3.1'
-  s.add_development_dependency 'rspec', ['~> 3.0']
+  s.required_ruby_version = '>= 2.7.0'
+  s.add_development_dependency 'rspec', ['~> 3.9']
 end
