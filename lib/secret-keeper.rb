@@ -2,27 +2,37 @@ require 'openssl'
 require 'yaml'
 
 class SecretKeeper
+  attr_reader :tasks, :options
+
   def self.encrypt_files
+    printer = ['Encrypting...']
     sk = SecretKeeper.new
-    puts 'Encrypting...' unless sk.slience
+    printer << '(production config removed)' if sk.options['remove_production']
+    printer << '(source files removed)' if sk.options['remove_source']
     ok_queue = []
     sk.tasks.each do |task|
-      from = task['encrypt_from']
+      from = File.exists?(task['encrypt_from']) ? task['encrypt_from'] : task['decrypt_to']
       to = task['encrypt_to']
 
       result = sk.encrypt_file(from, to)
+      if result == :ok
+        result = sk.remove_file(from) if sk.options['remove_source']
+      end
+
       ok_queue << result if result == :ok
-      puts "  * #{from} --> #{to}, #{result}" unless sk.slience
+      printer << "  * #{from} --> #{to}, #{result}"
     end
     success = ok_queue.count == sk.tasks.count
-    puts success ? 'Done!' : 'Failed!' unless sk.slience
+    printer << (success ? 'Done!' : 'Failed!')
+    printer.each{ |row| puts row } unless sk.options['slience']
     success
   end
 
-  def self.decrypt_files(remove_production=false)
+  def self.decrypt_files
+    printer = ['Decrypting...']
     sk = SecretKeeper.new
-    print 'Decrypting...' unless sk.slience
-    puts remove_production ? '(production config removed)' : nil unless sk.slience
+    printer << '(production config removed)' if sk.options['remove_production']
+    printer << '(source files removed)' if sk.options['remove_source']
 
     ok_queue = []
     sk.tasks.each do |task|
@@ -30,16 +40,17 @@ class SecretKeeper
       to = task['decrypt_to'] || task['encrypt_from']
 
       result = sk.decrypt_file(from, to)
-
-      if result == :ok && remove_production
-        result = sk.remove_production_config(to)
+      if result == :ok
+        result = sk.remove_production_config(to) if sk.options['remove_production']
+        result = sk.remove_file(from) if sk.options['remove_source']
       end
 
       ok_queue << result if result == :ok
-      puts "  * #{from} --> #{to}, #{result}" unless sk.slience
+      printer << "  * #{from} --> #{to}, #{result}"
     end
     success = ok_queue.count == sk.tasks.count
-    puts success ? 'Done!' : 'Failed!' unless sk.slience
+    printer << (success ? 'Done!' : 'Failed!')
+    printer.each{ |row| puts row } unless sk.options['slience']
     success
   end
 
@@ -56,15 +67,7 @@ class SecretKeeper
     @using_cipher = OpenSSL::Cipher.new(config['cipher'] || 'AES-256-CBC')
     @cipher_key = Digest::SHA2.hexdigest(ENV[ev_name])[0...@using_cipher.key_len]
 
-    @slience = config['slience'] || false
-  end
-
-  def tasks
-    @tasks
-  end
-
-  def slience
-    @slience
+    @options = config['options']
   end
 
   def encrypt_file(from_file, to_file)
@@ -88,6 +91,13 @@ class SecretKeeper
     hash = YAML.load_file(file_path)
     hash.delete('production')
     File.write(file_path, YAML.dump(hash))
+    :ok
+  rescue => e
+    e
+  end
+
+  def remove_file(file_path)
+    File.delete(file_path)
     :ok
   rescue => e
     e

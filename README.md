@@ -12,6 +12,16 @@ with bundler, write follwing line in your Gemfile
 
     gem 'secret-keeper', require: false
 
+## Upgrade from v1 to v2
+
+The *remove_production* parameter of *decrypt_files* has been removed after version 2.0.0.
+If you wants to remove *production* settings after decrypt files, you can set *remove_production* option to *true* in *secret-keeper.yml*:
+
+```
+  options:
+    remove_production: false
+```
+
 ## Usage
 setup files need to be encrypted in config/secret-keeper.yml
 
@@ -19,6 +29,10 @@ setup files need to be encrypted in config/secret-keeper.yml
     development:
       ev_name: SECRET_KEEPER
       cipher: AES-256-CBC
+      options:
+        slience: false
+        remove_production: false
+        remove_source: false
       tasks:
         -
           encrypt_from: example/database.yml
@@ -55,16 +69,18 @@ decrypt files based on your tasks defined in config/secret-keeper.yml
     #   * example/secrets.yml.enc --> example/secrets.yml, ok
     # Done!
 
-decrypt files and remove production configs
-
-    irb> production? = true
-    irb> SecretKeeper.decrypt_files(production?)
-    # Decrypting... (production config removed)
-    #   * example/database.yml.enc --> example/database.yml, ok
-    #   * example/secrets.yml.enc --> example/secrets.yml, ok
-    # Done!
-
 ## Available Ciphers
 
     irb> require 'openssl'
     irb> OpenSSL::Cipher.ciphers
+
+## Options
+
+* slience
+When this option set to *true*, the tasks will run in slience mode. Messages will not show no screen. Default is *false*.
+
+* remove_production
+When this option set to *true*, the *production* settings in the decrypted files will be removed after the decryption task. Default is *false*.
+
+* remove_source
+When this option set to *true*, the source file will be removed after either encrypt or decrypt tasks. Default is *false*.

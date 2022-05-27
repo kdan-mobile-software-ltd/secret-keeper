@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'yaml'
+require 'fileutils'
 require 'secret-keeper'
 
 Bundler.setup

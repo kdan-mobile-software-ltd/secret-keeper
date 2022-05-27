@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    secret-keeper (1.0.0)
+    secret-keeper (2.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -31,11 +31,11 @@ PLATFORMS
 
 DEPENDENCIES
   irb
-  rspec (~> 3.0)
+  rspec (~> 3.9)
   secret-keeper!
 
 RUBY VERSION
-   ruby 2.7.2p137
+   ruby 3.0.3p157
 
 BUNDLED WITH
-   2.1.4
+   2.2.32
