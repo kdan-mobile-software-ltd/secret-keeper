@@ -58,12 +58,12 @@ class SecretKeeper
     env = ENV['RAILS_ENV'] || 'development'
     string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
     fail 'config/secret-keeper.yml not existed nor not readable' if string.nil?
-    begin 
+    begin
       config = YAML.load(string, aliases: true)[env] || {}
     rescue ArgumentError
       config = YAML.load(string)[env] || {}
     end
-    fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil?
+    fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil? || config.empty?
     ev_name = config['ev_name'] || 'SECRET_KEEPER'
     fail "environment variable #{ev_name} not exist" if ENV[ev_name].nil?
 
