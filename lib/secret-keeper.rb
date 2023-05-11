@@ -11,7 +11,7 @@ class SecretKeeper
     printer << '(source files removed)' if sk.options['remove_source']
     ok_queue = []
     sk.tasks.each do |task|
-      from = File.exists?(task['encrypt_from']) ? task['encrypt_from'] : task['decrypt_to']
+      from = File.exist?(task['encrypt_from']) ? task['encrypt_from'] : task['decrypt_to']
       to = task['encrypt_to']
 
       result = sk.encrypt_file(from, to)
@@ -58,8 +58,12 @@ class SecretKeeper
     env = ENV['RAILS_ENV'] || 'development'
     string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
     fail 'config/secret-keeper.yml not existed nor not readable' if string.nil?
-    config = YAML.load(string)[env]
-    fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil?
+    begin
+      config = YAML.load(string, aliases: true)[env] || {}
+    rescue ArgumentError
+      config = YAML.load(string)[env] || {}
+    end
+    fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil? || config.empty?
     ev_name = config['ev_name'] || 'SECRET_KEEPER'
     fail "environment variable #{ev_name} not exist" if ENV[ev_name].nil?
 
@@ -88,7 +92,11 @@ class SecretKeeper
 
   def remove_production_config(file_path)
     return :ok unless file_path =~ /\.yml/
-    hash = YAML.load_file(file_path)
+    begin
+      hash = YAML.load_file(file_path, aliases: true)
+    rescue ArgumentError
+      hash = YAML.load_file(file_path)
+    end
     hash.delete('production')
     File.write(file_path, YAML.dump(hash))
     :ok

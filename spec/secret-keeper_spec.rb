@@ -28,8 +28,8 @@ describe SecretKeeper do
       SecretKeeper.new.tasks.each do |task|
         source_file = task['encrypt_from']
         target_file = task['encrypt_to']
-        expect(File.exists?(source_file)).to eq(false)
-        expect(File.exists?(target_file)).to eq(true)
+        expect(File.exist?(source_file)).to eq(false)
+        expect(File.exist?(target_file)).to eq(true)
       end
     end
   end
@@ -38,7 +38,11 @@ describe SecretKeeper do
     it 'should return true' do
       result = SecretKeeper.decrypt_files
       expect(result).to eq(true)
-      hash = YAML.load_file('example/secrets.yml')
+      begin
+        hash = YAML.load_file('example/secrets.yml', aliases: true)
+      rescue ArgumentError
+        hash = YAML.load_file('example/secrets.yml')
+      end
       expect(hash['development']['secret_key_base']).to eq('e8310af93d52f174f475940c41fbfb90417b300ebc19e1b24bd5639f4fe35c5ffaa5775a347ace9732958f656a47f6bb8e1fd0760b12e51b0b4fe1f65ef0a1d6')
       expect(hash['production']['secret_key_base']).to eq('339f639f4fe35c5ffaa47ace973260b12e51b0b4fe1f65effd283a5f054f47594b24bd565779e351a20dfd4ada4f777958f0417b305c06cdedbde392b8e1fd07')
     end
@@ -71,8 +75,8 @@ describe SecretKeeper do
       SecretKeeper.new.tasks.each do |task|
         source_file = task['decrypt_from'] || task['encrypt_to']
         target_file = task['decrypt_to'] || task['encrypt_from']
-        expect(File.exists?(source_file)).to eq(false)
-        expect(File.exists?(target_file)).to eq(true)
+        expect(File.exist?(source_file)).to eq(false)
+        expect(File.exist?(target_file)).to eq(true)
       end
     end
 
@@ -92,8 +96,8 @@ describe SecretKeeper do
       SecretKeeper.new.tasks.each do |task|
         source_file = task['decrypt_from'] || task['encrypt_to']
         target_file = task['decrypt_to'] || task['encrypt_from']
-        expect(File.exists?(source_file)).to eq(false)
-        expect(File.exists?(target_file)).to eq(true)
+        expect(File.exist?(source_file)).to eq(false)
+        expect(File.exist?(target_file)).to eq(true)
       end
     end
 
