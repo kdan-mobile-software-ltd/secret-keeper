@@ -61,7 +61,7 @@ class SecretKeeper
     begin 
       config = YAML.load(string, aliases: true)[env]
     rescue ArgumentError
-      YAML.load(string) || {}
+      config = YAML.load(string) || {}
     end
     fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil?
     ev_name = config['ev_name'] || 'SECRET_KEEPER'
