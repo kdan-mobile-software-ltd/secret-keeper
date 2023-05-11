@@ -28,8 +28,8 @@ describe SecretKeeper do
       SecretKeeper.new.tasks.each do |task|
         source_file = task['encrypt_from']
         target_file = task['encrypt_to']
-        expect(File.exists?(source_file)).to eq(false)
-        expect(File.exists?(target_file)).to eq(true)
+        expect(File.exist?(source_file)).to eq(false)
+        expect(File.exist?(target_file)).to eq(true)
       end
     end
   end
@@ -71,8 +71,8 @@ describe SecretKeeper do
       SecretKeeper.new.tasks.each do |task|
         source_file = task['decrypt_from'] || task['encrypt_to']
         target_file = task['decrypt_to'] || task['encrypt_from']
-        expect(File.exists?(source_file)).to eq(false)
-        expect(File.exists?(target_file)).to eq(true)
+        expect(File.exist?(source_file)).to eq(false)
+        expect(File.exist?(target_file)).to eq(true)
       end
     end
 
@@ -92,8 +92,8 @@ describe SecretKeeper do
       SecretKeeper.new.tasks.each do |task|
         source_file = task['decrypt_from'] || task['encrypt_to']
         target_file = task['decrypt_to'] || task['encrypt_from']
-        expect(File.exists?(source_file)).to eq(false)
-        expect(File.exists?(target_file)).to eq(true)
+        expect(File.exist?(source_file)).to eq(false)
+        expect(File.exist?(target_file)).to eq(true)
       end
     end
 
