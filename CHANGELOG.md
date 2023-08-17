@@ -1,3 +1,6 @@
+## [2.0.3] - 2023-08-17
+- Fix the bug that causes garbled characters when decrypting files.
+
 ## [2.0.2] - 2023-05-18
 - Add gitlab templates.
 
