@@ -114,13 +114,13 @@ class SecretKeeper
   private
 
   def encrypt(data)
-    cipher = @using_cipher.encrypt
+    cipher = OpenSSL::Cipher.new(@using_cipher.name).encrypt
     cipher.key = @cipher_key
     cipher.update(data) + cipher.final
   end
 
   def decrypt(data)
-    cipher = @using_cipher.decrypt
+    cipher = OpenSSL::Cipher.new(@using_cipher.name).decrypt
     cipher.key = @cipher_key
     cipher.update(data) + cipher.final
   end
