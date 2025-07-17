@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   }
 
   s.required_ruby_version = '>= 2.7.0'
-  s.add_development_dependency 'rspec', ['~> 3.9']
+  s.add_development_dependency 'rspec', ['~> 3.13']
 end

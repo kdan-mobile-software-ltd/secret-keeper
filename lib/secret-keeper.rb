@@ -59,9 +59,9 @@ class SecretKeeper
     string = File.open('config/secret-keeper.yml', 'rb') { |f| f.read }
     fail 'config/secret-keeper.yml not existed nor not readable' if string.nil?
     begin
-      config = YAML.load(string, aliases: true)[env] || {}
+      config = YAML.safe_load(string, aliases: true)[env] || {}
     rescue ArgumentError
-      config = YAML.load(string)[env] || {}
+      config = YAML.safe_load(string)[env] || {}
     end
     fail 'config/secret-keeper.yml incorrect or environment not exist' if config.nil? || config.empty?
     ev_name = config['ev_name'] || 'SECRET_KEEPER'
@@ -93,9 +93,9 @@ class SecretKeeper
   def remove_production_config(file_path)
     return :ok unless file_path =~ /\.yml/
     begin
-      hash = YAML.load_file(file_path, aliases: true)
+      hash = YAML.safe_load_file(file_path, aliases: true)
     rescue ArgumentError
-      hash = YAML.load_file(file_path)
+      hash = YAML.safe_load_file(file_path)
     end
     hash.delete('production')
     File.write(file_path, YAML.dump(hash))
