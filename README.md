@@ -1,6 +1,6 @@
 # Secret Keeper
 
-Keep all your secret files within openssl
+Keep all your secret files within openssl.
 
 ## Install
 
